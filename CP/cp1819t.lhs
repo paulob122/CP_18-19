@@ -191,6 +191,7 @@ import qualified Graphics.Gloss as G
 import Control.Monad
 import Control.Applicative hiding ((<|>))
 import Data.Either
+import Data.Char
 import Exp
 \end{code}
 %endif
@@ -1131,7 +1132,7 @@ outras funções auxiliares que sejam necessárias.
 
 \begin{code}
 
--- Auxiliar da função In da data Expr
+-- Auxiliar da função In da data Expr-----------------------
 
 inExprAux :: (Op, (Expr, Expr)) -> Expr
 inExprAux (a, (b, c)) = Bop b a c
@@ -1141,13 +1142,13 @@ inExprAux (a, (b, c)) = Bop b a c
 inExpr :: Either Int (Op,(Expr,Expr)) -> Expr
 inExpr = either Num inExprAux 
 
--- Função Out da data Expr
+-- Função Out da data Expr------------------------------------
 
 outExpr :: Expr -> Either Int (Op,(Expr,Expr))
 outExpr (Num a) = Left (a)
 outExpr (Bop a op b) =  Right(op,(a, b))
 
--- Funções catas, anas e hilos... (já fornecidas)
+-- Funções catas, anas e hilos... (já fornecidas))------------
 
 recExpr f = baseExpr id f
 
@@ -1157,7 +1158,7 @@ anaExpr g = inExpr . (recExpr(anaExpr g)) . g
 
 hiloExpr h g = cataExpr h . anaExpr g
 
--- Auxiliar da calcula que faz parse da string operação
+-- Auxiliar da calcula que faz parse da string operação)------
 
 parseOp :: (Op,(Int,Int)) -> Int
 parseOp (Op op,(a,b)) | op == "+"   = a + b  
@@ -1165,16 +1166,24 @@ parseOp (Op op,(a,b)) | op == "+"   = a + b
                       | op == "*"   = a * b  
                       | op == "mod" = mod a b 
 
-
 calcula :: Expr -> Int
 calcula = cataExpr (either id parseOp)
 
 converte :: Expr -> String
 converte (Num n) |n >= 0 = "Num "  ++ show n 
                  |otherwise = "Num " ++ "(" ++ show n ++ ")"
-converte (Bop a (Op op) b)  = "Bop " ++ "(" ++ (converte a) ++") " ++ "(Op " ++ ['"'] ++ op ++ ['"'] ++ ") " ++ "(" ++ (converte b) ++ ")"
+
+converte (Bop a (Op op) b) = "Bop " ++ "(" ++ (converte a) ++") " 
+                                    ++"(Op "++['"']++op++['"']++") " 
+                                    ++ "(" ++ (converte b) ++ ")"
 
 show' = converte
+
+-- Para fazer o compiler (Not finished)---------------------
+
+-- 2 * 3 + 4 + 5
+-- Converter para:
+-- 2 3 * 4 + 5 + 
 
 compile :: String -> Codigo
 compile = undefined 
@@ -1183,6 +1192,9 @@ compile = undefined
 
 exp_test :: Expr
 exp_test = (Bop (Num 5) (Op "*") (Num 6))
+
+string_codigo_1 :: String
+string_codigo_1 = "2+3*4"
 
 \end{code}
 
