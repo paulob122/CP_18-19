@@ -875,6 +875,7 @@ readBinOp = (map (\ ((x,(y,z)),t) -> ((Bop x y z),t))) .
                    ((readNum `ou` (pcurvos readExp))
                     `depois` (readOp `depois` readExp))
 
+
 readExp :: ReadS Expr
 readExp = readBinOp `ou` (
           readNum `ou` (
@@ -1169,24 +1170,29 @@ parseOp (Op op,(a,b)) | op == "+"   = a + b
 calcula :: Expr -> Int
 calcula = cataExpr (either id parseOp)
 
-converte :: Expr -> String
-converte (Num n) |n >= 0 = "Num "  ++ show n 
-                 |otherwise = "Num " ++ "(" ++ show n ++ ")"
+cnvNum :: (Num a, Show a) => a -> String
+cnvNum a = "(Num " ++ show a ++ ")"                                 
 
-converte (Bop a (Op op) b) = "Bop " ++ "(" ++ (converte a) ++") " 
-                                    ++"(Op "++['"']++op++['"']++") " 
-                                    ++ "(" ++ (converte b) ++ ")"
+cnvPar :: (Op, (String, String)) -> String
+cnvPar (Op op, (s1, s2)) = "Bop " ++ s1 ++ " ("  ++ (show (Op op)) ++ ") " ++ s2
 
-show' = converte
+show' = cataExpr (either cnvNum cnvPar)
 
 -- Para fazer o compiler (Not finished)---------------------
 
--- 2 * 3 + 4 + 5
--- Converter para:
--- 2 3 * 4 + 5 + 
+opToCodigo :: Op -> String
+opToCodigo (Op op) | op == "+" = "ADD"
+                   | op == "-" = "SUB"
+                   | op == "*" = "MUL"
+                   | op == "mod" = "MOD"
 
-compile :: String -> Codigo
-compile = undefined 
+func :: Expr -> Codigo
+func (Num a) = ["PUSH " ++ show a]
+func (Bop a op b) = func a ++ func b ++ [opToCodigo op]
+
+compile = concat . anaList g
+    where g [] = Left ()
+          g l  = Right (func (fst (head (readExp l))), [])
 
 -- Testes contendo diferentes expressões
 
@@ -1194,7 +1200,7 @@ exp_test :: Expr
 exp_test = (Bop (Num 5) (Op "*") (Num 6))
 
 string_codigo_1 :: String
-string_codigo_1 = "2+3*4"
+string_codigo_1 = "2 + 3 * 4"
 
 \end{code}
 
