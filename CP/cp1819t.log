@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.6.2)  2 JUN 2019 17:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.6.2)  2 JUN 2019 17:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -950,13 +950,8 @@ LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 303.
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 313.
-LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 332.
-
-
-LaTeX Warning: Citation `Kn92' on page 1 undefined on input line 332.
-
 LaTeX Font Info:    Try loading font information for OT1+pcr on input line 337.
+
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
@@ -978,6 +973,8 @@ File: omsppl.fd
 LaTeX Font Info:    Font shape `OMS/ppl/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 447.
  [2]
+LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 456.
 \openout5 = `cp1819t.ptb'.
 
 \openout5 = `cp1819t.ptb'.
@@ -997,17 +994,17 @@ LaTeX Font Info:    Font shape `OMS/ppl/m/n' in size <10> not available
 
 \openout5 = `cp1819t.ptb'.
 
-<cp1819t_media/ex3.png, id=102, 379.4175pt x 309.155pt>
+<cp1819t_media/ex3.png, id=104, 379.4175pt x 309.155pt>
 File: cp1819t_media/ex3.png Graphic file (type png)
 <use cp1819t_media/ex3.png>
 Package pdftex.def Info: cp1819t_media/ex3.png  used on input line 629.
 (pdftex.def)             Requested size: 70.0pt x 57.0371pt.
-<cp1819t_media/ex2.png, id=104, 290.08376pt x 284.06125pt>
+<cp1819t_media/ex2.png, id=106, 290.08376pt x 284.06125pt>
 File: cp1819t_media/ex2.png Graphic file (type png)
 <use cp1819t_media/ex2.png>
 Package pdftex.def Info: cp1819t_media/ex2.png  used on input line 632.
 (pdftex.def)             Requested size: 91.04742pt x 89.15468pt.
-<cp1819t_media/ex.png, id=105, 925.4575pt x 724.7075pt>
+<cp1819t_media/ex.png, id=107, 925.4575pt x 724.7075pt>
 File: cp1819t_media/ex.png Graphic file (type png)
 <use cp1819t_media/ex.png>
 Package pdftex.def Info: cp1819t_media/ex.png  used on input line 639.
@@ -1037,11 +1034,6 @@ Overfull \hbox (9.2584pt too wide) in paragraph at lines 660--667
 Package hyperref Warning: Suppressing link with empty target on input line 726.
 
 
-LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <8> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 726.
-
-LaTeX Warning: Citation `Ol18' on page 5 undefined on input line 726.
-
 
 Package hyperref Warning: Suppressing link with empty target on input line 726.
 
@@ -1055,10 +1047,6 @@ File: ot1phv.fd 2001/06/04 scalable font definitions for OT1/phv.
 
 \openout5 = `cp1819t.ptb'.
 
-
-
-LaTeX Warning: Citation `Ol18' on page 6 undefined on input line 771.
-
 \openout5 = `cp1819t.ptb'.
 
 \openout5 = `cp1819t.ptb'.
@@ -1067,7 +1055,7 @@ LaTeX Warning: Citation `Ol18' on page 6 undefined on input line 771.
 
 \openout5 = `cp1819t.ptb'.
 
-[6]
+ [6]
 \openout5 = `cp1819t.ptb'.
 
 \openout5 = `cp1819t.ptb'.
@@ -1101,7 +1089,7 @@ LaTeX Font Info:    Font shape `OT1/ppl/bx/it' in size <10> not available
 
 \openout5 = `cp1819t.ptb'.
 
-<cp1819t_media/fs.png, id=186, 179.67125pt x 255.95625pt>
+<cp1819t_media/fs.png, id=191, 179.67125pt x 255.95625pt>
 File: cp1819t_media/fs.png Graphic file (type png)
 <use cp1819t_media/fs.png>
 Package pdftex.def Info: cp1819t_media/fs.png  used on input line 1109.
@@ -1109,17 +1097,10 @@ Package pdftex.def Info: cp1819t_media/fs.png  used on input line 1109.
  [9 <./cp1819t_media/fs.png>]
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <20.74> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 1118.
-
-
-LaTeX Warning: Citation `Ol18' on page 10 undefined on input line 1123.
-
-<xymatrix 2x2 191>
+ <xymatrix 2x2 191>
 
 Package hyperref Warning: Suppressing link with empty target on input line 1157
 .
-
-
-LaTeX Warning: Citation `Ol18' on page 10 undefined on input line 1158.
 
 
 Package hyperref Warning: Suppressing link with empty target on input line 1158
@@ -1375,12 +1356,6 @@ Type  H <return>  for immediate help.
                                                   
 l.2375 \begin{enumerate*}
                          
-? ^^[[A^^[[A
-Type <return> to proceed, S to scroll future error messages,
-R to run without stopping, Q to run quietly,
-I to insert something, E to edit your file,
-1 or ... or 9 to ignore the next 1 to 9 tokens of input,
-H for help, X to quit.
 ? 
 
 ! LaTeX Error: Lonely \item--perhaps a missing list environment.
@@ -1437,6 +1412,59 @@ Underfull \hbox (badness 10000) detected at line 2463
 
 \openout5 = `cp1819t.ptb'.
 
+<xymatrix 3x2 202>
+! Misplaced alignment tab character &.
+\reserved@a ->&
+                & &
+l.2503 \end{eqnarray*}
+                      
+? 
+! Misplaced alignment tab character &.
+\reserved@a ->& &
+                  &
+l.2503 \end{eqnarray*}
+                      
+? 
+! Misplaced alignment tab character &.
+\reserved@a ->& & &
+                   
+l.2503 \end{eqnarray*}
+                      
+? 
+! Misplaced \cr.
+\@@eqncr ...l \@eqnswtrue \global \@eqcnt \z@ \cr 
+                                                  
+l.2503 \end{eqnarray*}
+                      
+? 
+! Extra }, or forgotten \endgroup.
+\endeqnarray ->\@@eqncr \egroup 
+                                \global \advance \c@equation \m@ne $$\@ignor...
+l.2503 \end{eqnarray*}
+                      
+? 
+
+! LaTeX Error: \begin{document} ended by \end{eqnarray*}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.2503 \end{eqnarray*}
+                      
+? 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.2503 \end{eqnarray*}
+                      
+? 
+! Display math should end with $$.
+<to be read again> 
+                   \endgroup 
+l.2503 \end{eqnarray*}
+                      
+? 
 
 ! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
@@ -1444,30 +1472,12 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.2486 \item \textbf
+l.2505 \item \textbf
                     {d)} \ensuremath{\Varid{find}\mathbin{::}\Varid{a}\to \C...
 
 ? 
 
-Underfull \hbox (badness 10000) detected at line 2486
-[][]
- []
-
-\openout5 = `cp1819t.ptb'.
-
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.2519 \item \textbf
-                    {e)} \ensuremath{\Varid{new}\mathbin{::}\Conid{Path}\;\V...
-
-? 
-
-Underfull \hbox (badness 10000) detected at line 2519
+Underfull \hbox (badness 10000) detected at line 2505
 [][]
  []
 
@@ -1481,12 +1491,30 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.2548 \item \textbf
+l.2538 \item \textbf
+                    {e)} \ensuremath{\Varid{new}\mathbin{::}\Conid{Path}\;\V...
+
+? 
+
+Underfull \hbox (badness 10000) detected at line 2538
+[][]
+ []
+
+\openout5 = `cp1819t.ptb'.
+
+
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.2569 \item \textbf
                     {f)} \ensuremath{\Varid{cp}\mathbin{::}\Conid{Path}\;\Va...
 
 ? 
 
-Underfull \hbox (badness 10000) detected at line 2548
+Underfull \hbox (badness 10000) detected at line 2569
 [][]
  []
 
@@ -1499,12 +1527,12 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.2567 \item \textbf
-                    {g} \ensuremath{\Varid{rm}\mathbin{::}\Conid{Path}\;\Var...
+l.2590 \item \textbf
+                    {g)} \ensuremath{\Varid{rm}\mathbin{::}\Conid{Path}\;\Va...
 
 ? 
 
-Underfull \hbox (badness 10000) detected at line 2567
+Underfull \hbox (badness 10000) detected at line 2590
 [][]
  []
 
@@ -1519,11 +1547,11 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.2606 \item \textbf
-                    {c)} Definições extras:
+l.2631 \item D
+              efinições extras:
 ? 
 
-Underfull \hbox (badness 10000) detected at line 2606
+Underfull \hbox (badness 10000) detected at line 2631
 [][]
  []
 
@@ -1536,32 +1564,34 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.2621 \end{enumerate*}
+l.2646 \end{enumerate*}
+                       
+? 
+! Extra \endgroup.
+<recently read> \endgroup 
+                          
+l.2646 \end{enumerate*}
                        
 ? 
 No file cp1819t.ind.
-No file cp1819t.bbl.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2635.
-[21]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2635.
+(./cp1819t.bbl)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2660.
+ [21]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2660.
  (./cp1819t.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2635.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2635.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2660.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2660.
 
 Package rerunfilecheck Info: File `cp1819t.out' has not changed.
 (rerunfilecheck)             Checksum: 29FC3DE535516031ECF2FD2C04E8E7A4;460.
-
-
-LaTeX Warning: There were undefined references.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2635.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2660.
  ) 
 Here is how much of TeX's memory you used:
- 12393 strings out of 494847
- 175563 string characters out of 6179081
- 321931 words of memory out of 5000000
- 15333 multiletter control sequences out of 15000+600000
- 40962 words of font info for 117 fonts, out of 8000000 for 9000
+ 12401 strings out of 494847
+ 175628 string characters out of 6179081
+ 321983 words of memory out of 5000000
+ 15336 multiletter control sequences out of 15000+600000
+ 41135 words of font info for 117 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
  42i,18n,77p,3290b,578s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
@@ -1589,10 +1619,10 @@ mf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/palatino/uplri8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/pub
 lic/xypic/xyatip10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/xypic/
 xybtip10.pfb>
-Output written on cp1819t.pdf (21 pages, 357348 bytes).
+Output written on cp1819t.pdf (21 pages, 360567 bytes).
 PDF statistics:
- 391 PDF objects out of 1000 (max. 8388607)
- 329 compressed objects within 4 object streams
- 95 named destinations out of 1000 (max. 500000)
+ 400 PDF objects out of 1000 (max. 8388607)
+ 338 compressed objects within 4 object streams
+ 98 named destinations out of 1000 (max. 500000)
  77 words of extra memory for PDF output out of 10000 (max. 10000000)
 

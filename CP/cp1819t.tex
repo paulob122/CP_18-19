@@ -300,13 +300,13 @@
 
 \begin{center}\large
 \begin{tabular}{ll}
-\textbf{Grupo} nr. & 99 (preencher)
+\textbf{Grupo} nr. & 26
 \\\hline
-a11111 & Nome1 (preencher)  
+a85227 & João Pedro Rodrigues Azevedo  
 \\
-a22222 & Nome2 (preencher)  
+a83719 & Pedro Filipe Costa Machado  
 \\
-a33333 & Nome3 (preencher)  
+a85729 & Paulo Jorge da Silva Araújo 
 \end{tabular}
 \end{center}
 
@@ -2483,6 +2483,25 @@ E também o diagrama para um catamorfismo genérico para este tipo de dados:
 \ColumnHook
 \end{hscode}\resethooks
 
+Esta solução utiliza um anamorfismo que é descrito de seguida:
+\par
+\xymatrix@C=2.5cm{
+&
+    \ensuremath{\Conid{FS}\;\Varid{a}\;\Varid{b}}
+&
+    \ensuremath{[\mskip1.5mu (\Varid{a},\Varid{b}\mathbin{+}\Conid{FS}\;\Varid{a}\;\Varid{b})\mskip1.5mu]}
+        \ar[l]^-{\ensuremath{\Varid{inFS}}}
+\\
+&
+    \ensuremath{[\mskip1.5mu (\Conid{Path}\;\Varid{a},\Varid{b})\mskip1.5mu]}
+        \ar[u]^-{\ensuremath{\Varid{f}\mathrel{=}\Varid{anaFS}}}
+        \ar[r]_-{\ensuremath{\Varid{g}\mathrel{=}\Varid{geneUntar}}}
+&
+    \ensuremath{[\mskip1.5mu (\Varid{a},\Varid{b}\mathbin{+}[\mskip1.5mu (\Conid{Path}\;\Varid{a},\Varid{b})\mskip1.5mu])\mskip1.5mu]}
+        \ar[u]_-{\ensuremath{\map \;(\Varid{id}\times(\Varid{id}\mathbin{+}\Varid{f}))}}
+}
+\end{eqnarray*}
+
 \item \textbf{d)} \ensuremath{\Varid{find}\mathbin{::}\Varid{a}\to \Conid{FS}\;\Varid{a}\;\Varid{b}\to [\mskip1.5mu \Conid{Path}\;\Varid{a}\mskip1.5mu]}
 
 \begin{hscode}\SaveRestoreHook
@@ -2521,6 +2540,12 @@ E também o diagrama para um catamorfismo genérico para este tipo de dados:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{new}\mathbin{::}(\Conid{Eq}\;\Varid{a})\Rightarrow \Conid{Path}\;\Varid{a}\to \Varid{b}\to \Conid{FS}\;\Varid{a}\;\Varid{b}\to \Conid{FS}\;\Varid{a}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{new}\;\Varid{p}\;\Varid{b}\;\Varid{fs}\mathrel{=}\Varid{untar}\;(\Varid{tar}\;(\Varid{fs})\plus [\mskip1.5mu (\Varid{p},\Varid{b})\mskip1.5mu]){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment }{}\<[E]%
+\\[\blanklineskip]%
 \>[B]{}\Varid{gNewCata}\mathbin{::}[\mskip1.5mu (\Varid{a},\Varid{b}+[\mskip1.5mu (\Conid{Path}\;\Varid{a},\Varid{b})\mskip1.5mu])\mskip1.5mu]\to [\mskip1.5mu (\Conid{Path}\;\Varid{a},\Varid{b})\mskip1.5mu]{}\<[E]%
 \\
 \>[B]{}\Varid{gNewCata}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}[\mskip1.5mu \mskip1.5mu]{}\<[E]%
@@ -2529,6 +2554,8 @@ E também o diagrama para um catamorfismo genérico para este tipo de dados:
 \\
 \>[B]{}\Varid{gNewCata}\;((\Varid{a},i_2\;\Varid{l})\mathbin{:}\Varid{t})\mathrel{=}(\Varid{addAllPaths}\;\Varid{a}\;\Varid{l})\plus (\Varid{gNewCata}\;\Varid{t}){}\<[E]%
 \\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment }{}\<[E]%
+\\[\blanklineskip]%
 \>[B]{}\Varid{gNewAna}\mathbin{::}[\mskip1.5mu (\Conid{Path}\;\Varid{a},\Varid{b})\mskip1.5mu]\to [\mskip1.5mu (\Varid{a},\Varid{b}+[\mskip1.5mu (\Conid{Path}\;\Varid{a},\Varid{b})\mskip1.5mu])\mskip1.5mu]{}\<[E]%
 \\
 \>[B]{}\Varid{gNewAna}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}[\mskip1.5mu \mskip1.5mu]{}\<[E]%
@@ -2536,12 +2563,6 @@ E também o diagrama para um catamorfismo genérico para este tipo de dados:
 \>[B]{}\Varid{gNewAna}\;(([\mskip1.5mu \Varid{x}\mskip1.5mu],\Varid{b})\mathbin{:}\Varid{t})\mathrel{=}[\mskip1.5mu (\Varid{x},i_1\;\Varid{b})\mskip1.5mu]\plus (\Varid{gNewAna}\;\Varid{t}){}\<[E]%
 \\
 \>[B]{}\Varid{gNewAna}\;(((\Varid{h}\mathbin{:}\Varid{t}),\Varid{b})\mathbin{:}\Varid{t1})\mathrel{=}[\mskip1.5mu (\Varid{h},i_2\;[\mskip1.5mu (\Varid{t},\Varid{b})\mskip1.5mu])\mskip1.5mu]\plus (\Varid{gNewAna}\;\Varid{t1}){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{new}\mathbin{::}(\Conid{Eq}\;\Varid{a})\Rightarrow \Conid{Path}\;\Varid{a}\to \Varid{b}\to \Conid{FS}\;\Varid{a}\;\Varid{b}\to \Conid{FS}\;\Varid{a}\;\Varid{b}{}\<[E]%
-\\
-\>[B]{}\Varid{new}\;\Varid{p}\;\Varid{b}\;\Varid{fs}\mathrel{=}\Varid{untar}\;(\Varid{tar}\;(\Varid{fs})\plus [\mskip1.5mu (\Varid{p},\Varid{b})\mskip1.5mu]){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\mbox{\onelinecomment new (p) (b) (fs) =  ( anaFS(gNewAna)  ( (cataFS (gNewCata) (fs)) ++ [(p, b)] ) )}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -2551,20 +2572,22 @@ E também o diagrama para um catamorfismo genérico para este tipo de dados:
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{29}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{cp}\mathbin{::}(\Conid{Eq}\;\Varid{a})\Rightarrow \Conid{Path}\;\Varid{a}\to \Conid{Path}\;\Varid{a}\to \Conid{FS}\;\Varid{a}\;\Varid{b}\to \Conid{FS}\;\Varid{a}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{cp}\;\Varid{list1}\;\Varid{list2}\;(\Conid{FS}\;\Varid{list3})\mathrel{=}\Varid{new}\;\Varid{list2}\;(\Varid{encontraFile}\;\Varid{list1}\;(\Varid{tar}\;(\Conid{FS}\;\Varid{list3})))\;(\Conid{FS}\;\Varid{list3}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment }{}\<[E]%
+\\[\blanklineskip]%
 \>[B]{}\Varid{encontraFile}\mathbin{::}(\Conid{Eq}\;\Varid{a})\Rightarrow \Conid{Path}\;\Varid{a}\to [\mskip1.5mu (\Conid{Path}\;\Varid{a},\Varid{b})\mskip1.5mu]\to \Varid{b}{}\<[E]%
 \\
 \>[B]{}\Varid{encontraFile}\;\Varid{list}\;((\Varid{x},\Varid{y})\mathbin{:}\Varid{t})\mid \Varid{list}\equiv \Varid{x}\mathrel{=}\Varid{y}{}\<[E]%
 \\
 \>[B]{}\hsindent{29}{}\<[29]%
 \>[29]{}\mid \Varid{otherwise}\mathrel{=}\Varid{encontraFile}\;\Varid{list}\;\Varid{t}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{cp}\mathbin{::}(\Conid{Eq}\;\Varid{a})\Rightarrow \Conid{Path}\;\Varid{a}\to \Conid{Path}\;\Varid{a}\to \Conid{FS}\;\Varid{a}\;\Varid{b}\to \Conid{FS}\;\Varid{a}\;\Varid{b}{}\<[E]%
-\\
-\>[B]{}\Varid{cp}\;\Varid{list1}\;\Varid{list2}\;(\Conid{FS}\;\Varid{list3})\mathrel{=}\Varid{new}\;\Varid{list2}\;(\Varid{encontraFile}\;\Varid{list1}\;(\Varid{tar}\;(\Conid{FS}\;\Varid{list3})))\;(\Conid{FS}\;\Varid{list3}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
-\item \textbf{g} \ensuremath{\Varid{rm}\mathbin{::}\Conid{Path}\;\Varid{a}\to \Conid{FS}\;\Varid{a}\;\Varid{b}\to \Conid{FS}\;\Varid{a}\;\Varid{b}}
+\item \textbf{g)} \ensuremath{\Varid{rm}\mathbin{::}\Conid{Path}\;\Varid{a}\to \Conid{FS}\;\Varid{a}\;\Varid{b}\to \Conid{FS}\;\Varid{a}\;\Varid{b}}
 
 Sugestão de implementação, definição de \textit{nav}:
 
@@ -2572,6 +2595,12 @@ Sugestão de implementação, definição de \textit{nav}:
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{36}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{nav}\mathbin{::}(\Conid{Eq}\;\Varid{a})\Rightarrow (\Conid{Path}\;\Varid{a},\Conid{FS}\;\Varid{a}\;\Varid{b})\to \Conid{FS}\;\Varid{a}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{nav}\mathrel{=}\Varid{anaFS}\;\Varid{gNav}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mbox{\onelinecomment }{}\<[E]%
+\\[\blanklineskip]%
 \>[B]{}\Varid{gNav}\mathbin{::}(\Conid{Eq}\;\Varid{a})\Rightarrow (\Conid{Path}\;\Varid{a},\Conid{FS}\;\Varid{a}\;\Varid{b})\to [\mskip1.5mu (\Varid{a},\Varid{b}+(\Conid{Path}\;\Varid{a},\Conid{FS}\;\Varid{a}\;\Varid{b}))\mskip1.5mu]{}\<[E]%
 \\
 \>[B]{}\Varid{gNav}\;((\Varid{h}\mathbin{:}\Varid{t}),\Conid{FS}\;[\mskip1.5mu \mskip1.5mu])\mathrel{=}[\mskip1.5mu \mskip1.5mu]{}\<[E]%
@@ -2585,10 +2614,6 @@ Sugestão de implementação, definição de \textit{nav}:
 \>[36]{}\mid (\Varid{h}\equiv \Varid{a})\mathrel{=}[\mskip1.5mu (\Varid{a},i_2\;(\Varid{t},\Varid{f}))\mskip1.5mu]{}\<[E]%
 \\
 \>[36]{}\mid \Varid{otherwise}\mathrel{=}\Varid{gNav}\;(\Varid{h}\mathbin{:}\Varid{t},\Conid{FS}\;\Varid{t1}){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{nav}\mathbin{::}(\Conid{Eq}\;\Varid{a})\Rightarrow (\Conid{Path}\;\Varid{a},\Conid{FS}\;\Varid{a}\;\Varid{b})\to \Conid{FS}\;\Varid{a}\;\Varid{b}{}\<[E]%
-\\
-\>[B]{}\Varid{nav}\mathrel{=}\Varid{anaFS}\;\Varid{gNav}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
@@ -2603,7 +2628,7 @@ Definição de \textit{rm}:
 \ColumnHook
 \end{hscode}\resethooks
 
-\item \textbf{c)} Definições extras:
+\item Definições extras:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%

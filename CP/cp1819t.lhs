@@ -113,13 +113,13 @@
 
 \begin{center}\large
 \begin{tabular}{ll}
-\textbf{Grupo} nr. & 99 (preencher)
+\textbf{Grupo} nr. & 26
 \\\hline
-a11111 & Nome1 (preencher)  
+a85227 & João Pedro Rodrigues Azevedo  
 \\
-a22222 & Nome2 (preencher)  
+a83719 & Pedro Filipe Costa Machado  
 \\
-a33333 & Nome3 (preencher)  
+a85729 & Paulo Jorge da Silva Araújo 
 \end{tabular}
 \end{center}
 
@@ -1603,6 +1603,25 @@ geneUntar (((h:t), b):cauda) = [(h, Right [(t, b)])] ++ geneUntar cauda
 
 \end{code}
 
+Esta solução utiliza um anamorfismo que é descrito de seguida:
+\par
+\xymatrix@@C=2.5cm{
+&
+    |FS a b|
+&
+    |[(a, b + FS a b)]|
+        \ar[l]^-{|inFS|}
+\\
+&
+    |[(Path a, b)]|
+        \ar[u]^-{|f = anaFS|}
+        \ar[r]_-{|g = geneUntar|}
+&
+    |[(a, b + [(Path a, b)])]|
+        \ar[u]_-{|map (id >< (id + f))|}
+}
+\end{eqnarray*}
+
 \item \textbf{d)} |find :: a -> FS a b -> [Path a ]|
 
 \begin{code}
@@ -1630,20 +1649,22 @@ gFind ((a, Right p):t) = p ++ (gFind t)
 
 \begin{code}
 
+new :: (Eq a) => Path a -> b -> FS a b -> FS a b
+new p b fs = untar( tar (fs) ++ [(p, b)])
+
+--
+
 gNewCata :: [(a, Either b [(Path a, b)])] -> [(Path a, b)]
 gNewCata [] = []
 gNewCata ((a, Left b):t) = [([a], b)] ++ (gNewCata t)
 gNewCata ((a, Right l):t) = (addAllPaths a l) ++ (gNewCata t)
 
+--
+
 gNewAna :: [(Path a, b)] -> [(a, Either b [(Path a, b)])]
 gNewAna [] = []
 gNewAna (([x], b):t) = [(x, Left b)] ++ (gNewAna t)
 gNewAna (((h:t), b):t1) = [(h, Right [(t, b)])] ++ (gNewAna t1)
-
-new :: (Eq a) => Path a -> b -> FS a b -> FS a b
-new p b fs = untar( tar (fs) ++ [(p, b)])
-
---new (p) (b) (fs) =  ( anaFS(gNewAna)  ( (cataFS (gNewCata) (fs)) ++ [(p, b)] ) )
 
 \end{code}
 
@@ -1651,12 +1672,14 @@ new p b fs = untar( tar (fs) ++ [(p, b)])
 
 \begin{code}
 
+cp :: (Eq a) => Path a -> Path a -> FS a b -> FS a b 
+cp list1 list2 (FS list3) = new list2 (encontraFile list1 (tar (FS list3))) (FS list3)  
+
+--
+
 encontraFile :: (Eq a) => Path a -> [(Path a,b)] -> b 
 encontraFile list ((x,y):t) | list == x = y 
                             | otherwise = encontraFile list t 
-
-cp :: (Eq a) => Path a -> Path a -> FS a b -> FS a b 
-cp list1 list2 (FS list3) = new list2 (encontraFile list1 (tar (FS list3))) (FS list3)  
 
 \end{code}
 
@@ -1666,16 +1689,30 @@ Sugestão de implementação, definição de \textit{nav}:
 
 \begin{code}
 
+nav :: (Eq a) => (Path a, FS a b) -> FS a b
+nav = anaFS gNav
+
+--
+
 gNav :: (Eq a) => (Path a, FS a b) -> [(a, Either b (Path a, FS a b))]
 gNav ((h:t), FS []) = []
+gNav ([], FS ((a, File b):t1)) = [(a, Left b)] ++ gNav ([], FS t1)
+gNav ([], FS ((a, Dir f):t1))  = [(a, Right ([], f))] ++ gNav ([], FS t1)
 gNav ((h:t), FS ((a, File b):t1) ) | (h == a) = [(a, Left b)]
                                    | otherwise = gNav (h:t, FS t1)
 gNav ((h:t), FS ((a, Dir f):t1) )  | (h == a) = [(a, Right (t, f))] 
-                                   | otherwise = gNav (h:t, FS t1) 
+                                   | otherwise = gNav (h:t, FS t1)
 
+--
 
-nav :: (Eq a) => (Path a, FS a b) -> FS a b
-nav = anaFS gNav
+geneRemove :: (Eq a) => (FS a b, FS a b) -> [(a, Either b (FS a b, FS a b))] 
+geneRemove (FS [], FS l) = []
+geneRemove (FS ((a, File b):t1), FS []) = [(a, Left b)] ++ geneRemove (FS t1, FS [])
+geneRemove (FS ((a, Dir f):t1), FS []) = [(a, Right (f, FS []))] ++ geneRemove (FS t1, FS [])
+geneRemove (FS ((a, File b):t1), FS h) | a == (fst (head h)) = [] 
+                                         | otherwise    = [(a, Left b)] ++ geneRemove (FS t1, FS h) 
+geneRemove (FS ((a, Dir f):t1), FS h) | a == (fst (head h)) = []
+                                        | otherwise    = [(a, Right (f, FS h))] ++ geneRemove (FS t1, FS h)
 
 \end{code}
 
@@ -1684,7 +1721,7 @@ Definição de \textit{rm}:
 \begin{code}
 
 rm :: (Eq a) => (Path a) -> (FS a b) -> FS a b
-rm = undefined
+rm p f = anaFS (geneRemove) (f,  nav (p, f))
 
 \end{code}
 
