@@ -1319,7 +1319,15 @@ collectLeafs (Comp b l r) = (collectLeafs l) ++ (collectLeafs r)
 --
 
 dimen :: X Caixa Tipo -> (Float, Float)
-dimen = undefined
+dimen = cataL2D (either casoUnid casoComp)
+
+casoUnid a = (fromIntegral (fst (fst a)), fromIntegral (snd (fst a))) 
+casoComp (Hb, ((x1, y1), (x2, y2))) = (x1 + x2, max y1 y2)   
+casoComp (H, ((x1, y1), (x2, y2))) = (x1 + x2, max y1 y2)   
+casoComp (Ht, ((x1, y1), (x2, y2))) = (x1 + x2, max y1 y2)   
+casoComp (V, ((x1, y1), (x2, y2))) = (max x1 x2, y1 + y2)   
+casoComp (Ve, ((x1, y1), (x2, y2))) = (max x1 x2, y1 + y2)   
+casoComp (Vd, ((x1, y1), (x2, y2))) = (max x1 x2, y1 + y2)   
 
 \end{code}
 
@@ -1334,23 +1342,9 @@ Seguem-se as definições da pergunta 1:
 \begin{code}
 
 calcOrigins :: ((X Caixa Tipo), Origem) -> X (Caixa, Origem) ()
-calcOrigins fig = calcOriginsAux (snd$fig) fig
-
---
-
-calcOriginsAux :: (Float, Float) -> ((X Caixa Tipo), Origem) -> X (Caixa, Origem) ()
-calcOriginsAux pos ((Unid ca), orig) = Unid (ca, pos)
-calcOriginsAux pos (Comp b (Unid ca) r, orig) = Comp () (Unid (ca, pos)) 
-                                                        (calcOriginsAux proxPosOrig (r, orig)) 
-  where proxPosOrig = calc b pos (convCoord(fst$ca))
-calcOriginsAux pos (Comp b l (Unid ca), orig) = Comp () (calcOriginsAux proxPosOrig (l, orig)) 
-                                                        (Unid (ca, pos)) 
-  where proxPosOrig = calc b pos (convCoord(fst$ca))
-calcOriginsAux pos (Comp b l r, orig) = Comp () (fst$fromLeft) 
-                                                (calcOriginsAux proxPosOrig (r, orig)) 
-  where fromLeft   = (calcOriginsAux pos (l, orig), pos)
-        lastOrigin = snd fromLeft 
-        proxPosOrig = calc b pos lastOrigin
+calcOrigins = anaL2D g
+  where g (Unid a, or) = Left (a, or) 
+        g (Comp b l r, o) = Right ((), ((l, o), (r, calc b o (dimen l))))   
 
 \end{code}
 
@@ -1377,7 +1371,6 @@ calc (V) orig (box_x, box_y)  = ((fst orig)
                                 (snd orig) + box_y)
 calc (Ve) orig (box_x, box_y)  = ((fst orig), (snd orig) + box_y)
 calc (Vd) orig (box_x, box_y)  = ((fst orig) + box_x, (snd orig) + box_y)
-
 
 \end{code}
 
@@ -1415,7 +1408,6 @@ criaPict (h:t)    = [(crCaixa or width height text col)] ++ (criaPict t)
         col       = (snd(snd(snd h)))
         toFloat x = fromIntegral x :: Float
 
-
 \end{code}
 \par
 Incluem-se aqui alguns testes aplicavéis às funções implementadas anteriormente: \par
@@ -1423,22 +1415,16 @@ Incluem-se aqui alguns testes aplicavéis às funções implementadas anteriorme
 \begin{code}
 
 testeOrigens1 :: (X Caixa Tipo, Origem)
-testeOrigens1 = (caixasHb1, (0, 0))
+testeOrigens1 = (caixaBas1, (0, 0))
 
-unidadeA :: X Caixa Tipo
+testeOrigens2 :: (X Caixa Tipo, Origem)
+testeOrigens2 = (caixaBas2, (0, 0))
+
 unidadeA = Unid ((100, 200), ("A", col_blue))
-
-unidadeB :: X Caixa Tipo
 unidadeB = Unid ((50, 50), ("B", col_green))
 
-caixasHb1 :: X Caixa Tipo
-caixasHb1 = Comp Hb unidadeA caixasHb2
-
-caixasHb2 :: X Caixa Tipo
-caixasHb2 = Comp Hb unidadeA unidadeB
-
-caixasBasico :: X Caixa Tipo
-caixasBasico = Comp Hb (Unid ((100, 200), ("A", col_blue))) (Unid ((50, 50), ("B", col_green)))
+caixaBas1 = Comp Hb unidadeA unidadeB
+caixaBas2 = Comp Hb unidadeA caixaBas1
 
 \end{code}
 
