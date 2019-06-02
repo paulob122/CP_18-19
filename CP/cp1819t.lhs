@@ -958,6 +958,7 @@ ex3Caixas = G.display (G.InWindow "Problema 4" (400, 400) (40, 40)) G.white mtes
           ybox2 = Unid ((100,300),("H",G.yellow))
           bot = Comp Hb wbox1 bbox2 
           top = (Comp Ve (Comp Hb bbox1 gbox1) (Comp Hb rbox1 (Comp H ybox1 rbox2)))
+
 \end{code}
 A seguinte função cria uma caixa a partir dos seguintes parâmetros: origem,
 largura, altura, etiqueta e côr de preenchimento.
@@ -1126,59 +1127,96 @@ outras funções auxiliares que sejam necessárias.
 
 \subsection*{Problema 1}
 
-%data Expr = Num Int 
-%               | Bop Expr Op Expr  deriving  (Eq,Show)
+\par
 
-%data Op = Op String deriving (Eq,Show)
+\subsubsection*{Pergunta 1 - Definições base para o tipo de dados}
 
 \begin{code}
 
--- Auxiliar da função In da data Expr-----------------------
-
-inExprAux :: (Op, (Expr, Expr)) -> Expr
-inExprAux (a, (b, c)) = Bop b a c
-
--- Função In da data Expr
-
 inExpr :: Either Int (Op,(Expr,Expr)) -> Expr
-inExpr = either Num inExprAux 
-
--- Função Out da data Expr------------------------------------
+inExpr = either Num bopCase 
+  where bopCase (a, (b, c)) = Bop b a c
 
 outExpr :: Expr -> Either Int (Op,(Expr,Expr))
-outExpr (Num a) = Left (a)
+outExpr (Num a) = Left a
 outExpr (Bop a op b) =  Right(op,(a, b))
 
--- Funções catas, anas e hilos... (já fornecidas))------------
-
 recExpr f = baseExpr id f
-
 cataExpr g = g . (recExpr(cataExpr g)) . outExpr
-
 anaExpr g = inExpr . (recExpr(anaExpr g)) . g
-
 hiloExpr h g = cataExpr h . anaExpr g
 
--- Auxiliar da calcula que faz parse da string operação)------
+\end{code}
+
+\subsubsection*{Pergunta 2 - Calcular o valor de uma expressão}
+
+\hspace{0.5cm} Calcular um valor de uma expressão passa por dois casos, explicitados no tipo de dados. Ou temos um \textit{Num} ou um \textit{Bop} e trata-se de uma operação de redução desse tipo a um número, daí a solução passar por um catamorfismo.
+
+Segue-se o diagrama mais apropriado para descrever este catamorfismo:
+
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |Expr|
+           \ar[d]_-{|cataExpr g|}
+           \ar[r]_-{|outExpr|}
+&
+    |Num + Op >< Expr >< Expr|
+           \ar[d]^-{|id + id >< (cataExpr g)|}
+\\
+     |Int|
+&
+    |Num + Op >< Int >< Int|
+           \ar[l]^-{|g = either id parseOp|}
+}
+\end{eqnarray*}
+
+\hspace{0.5cm} Aqui \textit{parseOp} auxilia a função calcula em converter uma operação e um par de Inteiros no resultado respetivo.
+
+\begin{code}
+
+calcula :: Expr -> Int
+calcula = cataExpr (either id parseOp)
+
+--
 
 parseOp :: (Op,(Int,Int)) -> Int
 parseOp (Op op,(a,b)) | op == "+"   = a + b  
                       | op == "-"   = a - b  
                       | op == "*"   = a * b  
                       | op == "mod" = mod a b 
+\end{code}
 
-calcula :: Expr -> Int
-calcula = cataExpr (either id parseOp)
+\subsubsection*{Pergunta 3 - \textit{Pretty printer} show' e a compile}
 
-cnvNum :: (Num a, Show a) => a -> String
-cnvNum a = "(Num " ++ show a ++ ")"                                 
+\hspace{0.5cm} Para converter um tipo de dados \textit{Expr} na sua representação \textit{String} basta-o converter para uma representação literal infixa. Um catamorfismo, mais uma vez, serviu para o caso.
 
-cnvPar :: (Op, (String, String)) -> String
-cnvPar (Op op, (s1, s2)) = "Bop " ++ s1 ++ " ("  ++ (show (Op op)) ++ ") " ++ s2
+\begin{code}
 
 show' = cataExpr (either cnvNum cnvPar)
 
--- Para fazer o compiler (Not finished)---------------------
+--
+
+cnvNum :: (Num a, Ord a, Show a) => a -> String
+cnvNum a | a < 0 = "(" ++ show a ++ ")"
+         | otherwise = show a                    
+
+--
+
+cnvPar :: (Op, (String, String)) -> String
+cnvPar (Op op, (s1, s2)) = "(" ++ s1 ++ op ++ s2 ++ ")"
+
+\end{code}
+
+\hspace{0.5cm} A operação de \textbf{compilar} uma \textit{String} torna-se trivial após se conseguir obter a representação da \textit{String} num \textit{Expr}, tendo para isso, a função \textit{readExp} fornecida. \par
+Após isso, basta apenas fazer um catamorfismo sobre o tipo de modo a explorar a recursividade.
+
+\begin{code}
+
+compile = cataExpr (either numToComp bopToCompile) . fst . head . readExp
+  where numToComp a                 = ["PUSH " ++ show a]
+        bopToCompile (op, (s1, s2)) = s1 ++ s2 ++ [opToCodigo op]
+
+--
 
 opToCodigo :: Op -> String
 opToCodigo (Op op) | op == "+" = "ADD"
@@ -1186,107 +1224,483 @@ opToCodigo (Op op) | op == "+" = "ADD"
                    | op == "*" = "MUL"
                    | op == "mod" = "MOD"
 
-func :: Expr -> Codigo
-func (Num a) = ["PUSH " ++ show a]
-func (Bop a op b) = func a ++ func b ++ [opToCodigo op]
+-- 
 
-compile = concat . anaList g
-    where g [] = Left ()
-          g l  = Right (func (fst (head (readExp l))), [])
+\end{code}
+\par
+\hspace{0.5cm} Para melhor representar a operação de compile, ou seja, converter \textit{Expr} em instruções \textbf{stack} segue-se o diagrama do catamorfismo implementado.
 
--- Testes contendo diferentes expressões
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |Expr|
+           \ar[d]_-{|cataExpr g|}
+           \ar[r]_-{|outExpr|}
+&
+    |Num + Op >< Expr >< Expr|
+           \ar[d]^-{|id + id >< (cataExpr g)|}
+\\
+     |[String]|
+&
+    |Num + Op >< [String] >< [String]|
+           \ar[l]^-{|g = either numToComp bopToCompile|}
+}
+\end{eqnarray*}
+
+
+\par
+\vspace{1cm}
+\hspace{0.5cm} Incluem-se aqui alguns testes aplicavéis às funções implementadas anteriormente: \par
+
+\begin{code}
 
 exp_test :: Expr
-exp_test = (Bop (Num 5) (Op "*") (Num 6))
+exp_test = Bop (Bop (Num 5) (Op "*") (Num 6)) (Op "+") (Num (-1))
 
 string_codigo_1 :: String
 string_codigo_1 = "2 + 3 * 4"
+
+string_codigo_2 :: String
+string_codigo_2 = "2 + 1 * 3 + 4"
 
 \end{code}
 
 \subsection*{Problema 2}
 
+\subsubsection*{Definições base do tipo de dados L2D}
+
+\hspace{0.5cm} O diagrama que representa um catamorfismo para este tipo é o seguinte:
+
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |L2D|
+           \ar[d]_-{|f = cataL2D g|}
+           \ar[r]_-{|outL2D|}
+&
+    |Unid + b >< L2D >< L2D|
+           \ar[d]^-{|id + id >< f >< f|}
+\\
+     |X|
+&
+    |Unid + b >< X >< X|
+           \ar[l]^-{|g|}
+}
+\end{eqnarray*}
+
+
 \begin{code}
+
 inL2D :: Either a (b, (X a b,X a b)) -> X a b
-inL2D = undefined
+inL2D = either casoUnid casoComp
+  where casoUnid a = Unid a
+        casoComp (b, (l, r)) = Comp b l r 
+
+--
 
 outL2D :: X a b -> Either a (b, (X a b,X a b))
-outL2D = undefined
+outL2D (Unid a) = Left a
+outL2D (Comp b l r) = Right (b, (l, r))
 
-recL2D f = undefined
+--
 
-cataL2D g = undefined
+recL2D f = baseL2D id f
+baseL2D f g = id -|- (f >< (g >< g))
+cataL2D g = g . (recL2D (cataL2D g)) . outL2D
+anaL2D g = inL2D . (recL2D (anaL2D g) ) . g
 
-anaL2D g = undefined
+\end{code}
 
-collectLeafs = undefined
+\subsubsection*{Definições de funções dadas como undefined neste documento}
+
+\begin{code}
+
+collectLeafs (Unid a) = [a]
+collectLeafs (Comp b l r) = (collectLeafs l) ++ (collectLeafs r) 
+
+--
 
 dimen :: X Caixa Tipo -> (Float, Float)
 dimen = undefined
 
-calcOrigins :: ((X Caixa Tipo),Origem) -> X (Caixa,Origem) ()
-calcOrigins = undefined
+\end{code}
+
+\subsubsection*{Pergunta 1}
+
+\hspace{0.5cm} Nesta pergunta era pedido uma função que dada uma origem e um conjunto de figuras em L2D fossem calculadas associações das mesmas com a origem respetiva, dados os diferentes tipo de associações.
+\par
+O padrão de recursividade segue mais casos e traz uma ligeira complexidade ao tipo de dados, mas contudo, este assemelha-se muito com uma BTree.
+\par
+Seguem-se as definições da pergunta 1:
+
+\begin{code}
+
+calcOrigins :: ((X Caixa Tipo), Origem) -> X (Caixa, Origem) ()
+calcOrigins fig = calcOriginsAux (snd$fig) fig
+
+--
+
+calcOriginsAux :: (Float, Float) -> ((X Caixa Tipo), Origem) -> X (Caixa, Origem) ()
+calcOriginsAux pos ((Unid ca), orig) = Unid (ca, pos)
+calcOriginsAux pos (Comp b (Unid ca) r, orig) = Comp () (Unid (ca, pos)) 
+                                                        (calcOriginsAux proxPosOrig (r, orig)) 
+  where proxPosOrig = calc b pos (convCoord(fst$ca))
+calcOriginsAux pos (Comp b l (Unid ca), orig) = Comp () (calcOriginsAux proxPosOrig (l, orig)) 
+                                                        (Unid (ca, pos)) 
+  where proxPosOrig = calc b pos (convCoord(fst$ca))
+calcOriginsAux pos (Comp b l r, orig) = Comp () (fst$fromLeft) 
+                                                (calcOriginsAux proxPosOrig (r, orig)) 
+  where fromLeft   = (calcOriginsAux pos (l, orig), pos)
+        lastOrigin = snd fromLeft 
+        proxPosOrig = calc b pos lastOrigin
+
+\end{code}
+
+\par
+
+\hspace{0.5cm} Seguem-se algumas funções auxiliares que foram necessárias ser implementadas.
+
+\begin{code}
+
+--
+
+convCoord :: (Int, Int) -> (Float, Float)
+convCoord (x, y) = (fromIntegral x :: Float, fromIntegral y :: Float)
+
+--
 
 calc :: Tipo -> Origem -> (Float, Float) -> Origem
-calc = undefined 
+calc (Hb) orig (box_x, box_y) = ((fst orig) + box_x, snd orig)
+calc (Ht) orig (box_x, box_y) = ((fst orig) + box_x, (snd orig) + box_y)
+calc (H) orig (box_x, box_y)  = ((fst orig) + box_x, (snd orig) 
+                              + (fromInteger $ round $ (box_y / 2) * (10^5)) / (10.0^^5))
+calc (V) orig (box_x, box_y)  = ((fst orig) 
+                              + (fromInteger $ round $ (box_x / 2) * (10^5)) / (10.0^^5), 
+                                (snd orig) + box_y)
+calc (Ve) orig (box_x, box_y)  = ((fst orig), (snd orig) + box_y)
+calc (Vd) orig (box_x, box_y)  = ((fst orig) + box_x, (snd orig) + box_y)
 
-caixasAndOrigin2Pict = undefined
+
+\end{code}
+
+\par
+
+\subsubsection*{Pergunta 2 - Agrupar as caixas e as suas origens numa só lista}
+
+\begin{code}
+
+agrup_caixas :: X (Caixa, Origem) () -> Fig
+agrup_caixas (Unid (ca, or)) = [(or, ca)]
+agrup_caixas (Comp b l r) = (agrup_caixas l) ++ (agrup_caixas r)
+
+\end{code}
+
+\par
+
+\subsubsection*{Display das caixas num gráfico 2D em gloss}
+
+\hspace{0.5cm} Tendo as origems calculadas apenas é preciso agrupar as caixas com as suas origens, gerar as respetivas \textit{G.Picture}, convertendo tudo para apenas uma \textit{G.Picture} e apresentar na janela gloss o resultado. Para tal foi crucial ter funções como \textit{crCaixa} e \textit{display} para criar \textit{G.Picture} e apresentá-las.
+
+\begin{code}
+
+mostra_Caixas = display . caixasAndOrigin2Pict
+
+caixasAndOrigin2Pict = G.pictures . criaPict . agrup_caixas . calcOrigins
+
+criaPict :: Fig -> [G.Picture]
+criaPict [] = []
+criaPict (h:t)    = [(crCaixa or width height text col)] ++ (criaPict t)
+  where or        = (fst h)
+        width     = (toFloat (fst(fst(snd h))))
+        height    = (toFloat (snd(fst(snd h))))
+        text      = (fst(snd(snd h)))
+        col       = (snd(snd(snd h)))
+        toFloat x = fromIntegral x :: Float
+
+
+\end{code}
+\par
+Incluem-se aqui alguns testes aplicavéis às funções implementadas anteriormente: \par
+
+\begin{code}
+
+testeOrigens1 :: (X Caixa Tipo, Origem)
+testeOrigens1 = (caixasHb1, (0, 0))
+
+unidadeA :: X Caixa Tipo
+unidadeA = Unid ((100, 200), ("A", col_blue))
+
+unidadeB :: X Caixa Tipo
+unidadeB = Unid ((50, 50), ("B", col_green))
+
+caixasHb1 :: X Caixa Tipo
+caixasHb1 = Comp Hb unidadeA caixasHb2
+
+caixasHb2 :: X Caixa Tipo
+caixasHb2 = Comp Hb unidadeA unidadeB
+
+caixasBasico :: X Caixa Tipo
+caixasBasico = Comp Hb (Unid ((100, 200), ("A", col_blue))) (Unid ((50, 50), ("B", col_green)))
+
 \end{code}
 
 \subsection*{Problema 3}
-Solução:
+
+\subsubsection*{Série de Taylor do cosseno - Uma aproximação...}
+
+\hspace{0.5cm} O objetivo do problema era implementar a série de Taylor através de uma aproximação de \textit{n} em vez de um somatório infinito, utilizando recursividade mútua.
+
+\begin{eqnarray*}
+  cos\ x = \sum_{i=0}^\infty \frac{(-1)^i}{(2i)!} x^{2i}
+\end{eqnarray*}
+\par
+Primeiro consideramos o \textit{cos x n} como sendo \textit{c x n}, assim, podemos verificar, através do somatório que:
+
+\begin{spec}
+
+c x 0       = 1
+c x (n + 1) = c x n + ((-1)^(n+1) * x^(2*n+2)) / ((2*n + 2)!) = c x n + h x n
+
+h x 0 = ((-x)^2) / 2 
+h x (n + 1) = (h x n) * (((-x)^2) / ((2*n + 4) * (2*n + 3))) = (h x n) * ((-x)^2) / (s n)
+
+s 0 = 12
+s (n + 1) = s n + 8 * n + 18 = s n + f n
+
+f 0 = 18
+f (n + 1) = f n + 8
+
+\end{spec}
+
+Agora, em termos de \textit{Haskell}, podemos separar o problema em 3 funções, \textit{loop} que representa o resultado recursivo para cada função (cujo funcionamento está descrito a cima), \textit{init} que inicializa o caso base, ou seja, o caso de paragem de cada função e por fim \texti{prj} que decide a função a apresentar quando se pretende mostrar o resultado da aproximação.
+
 \begin{code}
+
 cos' x = prj . for loop init where
-   loop = undefined
-   init = undefined
-   prj = undefined
+   loop (c, h, s, f) = (c+h, h*(-(x^2)/s), s+f, f+8)
+   init = (1, -(x^2)/2, 12, 18)
+   prj (c, h, s, f) = c
+
 \end{code}
 
 \subsection*{Problema 4}
-Triologia ``ana-cata-hilo":
-\begin{code}
-outFS (FS l) = undefined
-outNode = undefined
 
-baseFS f g h = undefined
+\subsubsection*{Triologia ``ana-cata-hilo" - \textit{Sistema de ficheiros genéricos}}
+
+\hspace{0.5cm} Seguindo a recomendação do enunciado deste problema, seguem-se as definições básicas para o tipo \textbf{FS a b}:
+
+\begin{code}
+
+outFS :: FS a b -> [(a, Either (b) (FS a b))]
+outFS (FS []) = []
+outFS (FS ((x,y):t)) = [(x, outNode y)] ++ outFS (FS t)
+
+outNode :: Node a b -> Either b (FS a b)
+outNode (File b) = Left(b)
+outNode (Dir x)  = Right(x)
+
+baseFS f g h = map(f >< (g -|- h))
 
 cataFS :: ([(a, Either b c)] -> c) -> FS a b -> c
-cataFS g = undefined
+cataFS g = g . (recFS(cataFS g)) . outFS
 
 anaFS :: (c -> [(a, Either b c)]) -> c -> FS a b
-anaFS g = undefined
+anaFS g = inFS . (recFS (anaFS g)) . g
 
-hyloFS g h = undefined
+hyloFS g h = cataFS h . anaFS g
+
 \end{code}
-Outras funções pedidas:
+
+E também o diagrama para um catamorfismo genérico para este tipo de dados:
+
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |FS a b|
+           \ar[d]_-{|f = cataFS g|}
+           \ar[r]_-{|outFS|}
+&
+    |[(a, b + FS a b)]|
+           \ar[d]^-{|map (id >< (id + f))|}
+\\
+     |X|
+&
+    |[(a, b + X)]|
+           \ar[l]^-{|g|}
+}
+\end{eqnarray*}
+
+\subsubsection*{Funções para manipulação de ficheiros}
+
+\begin{enumerate*}
+
+\item \textbf{a)} |check :: FS a b -> Bool|
+
 \begin{code}
+
 check :: (Eq a) => FS a b -> Bool
-check = undefined
+check = cataFS geneCheck
+
+--
+
+geneCheck :: (Eq a) => [(a, Either b Bool)] -> Bool
+geneCheck [] = True
+geneCheck ((x, Left b):t) = geneCheck t 
+geneCheck ((x, Right b):t) | b == False = False
+                        | otherwise = geneCheck t && not(repetidos(paraLista((x, Right b):t)))
+
+--
+
+estaNaLista :: (Eq a) =>  a -> [a] -> Bool
+estaNaLista _ [] = False
+estaNaLista x (h:t) | x == h    = True
+                    | otherwise = estaNaLista x t
+
+--
+
+repetidos :: (Eq a) => [a] -> Bool
+repetidos [] = False
+repetidos (h:t) | estaNaLista h t == True = True
+                | otherwise = repetidos t
+
+--
+
+paraLista :: [(a, Either b c)] -> Path a
+paraLista [] = []
+paraLista ((x,y):t) = [x] ++ paraLista t
+
+\end{code}
+
+\item \textbf{b)} |tar :: FS a b -> [(Path a, b)]|
+
+\begin{code}
 
 tar :: FS a b -> [(Path a, b)]
-tar = undefined
+tar = cataFS geneTar
+
+geneTar :: [(a, Either b [(Path a, b)])] -> [(Path a, b)]
+geneTar [] = []
+geneTar ((a, Left b):t) = [([a], b)] ++ geneTar t
+geneTar ((a, Right l):t) = (addAllPaths a l) ++ (geneTar t)
+
+addAllPaths :: a -> [(Path a, b)] -> [(Path a, b)] 
+addAllPaths a [] = [] 
+addAllPaths a ((list, b):t) = [([a] ++ list, b)] ++ addAllPaths a t
+
+\end{code}
+
+\item \textbf{c)} |untar :: [(Path a, b)] -> FS a b|
+
+\begin{code}
 
 untar :: (Eq a) => [(Path a, b)] -> FS a b
-untar = undefined
+untar = joinDupDirs . (anaFS geneUntar)
+
+--
+
+geneUntar :: [(Path a, b)] -> [(a, Either b ([(Path a,b)]))] 
+geneUntar [] = [] 
+geneUntar (([], b):cauda) = geneUntar cauda 
+geneUntar (([x], b):cauda) = [(x, Left b)] ++ geneUntar cauda 
+geneUntar (((h:t), b):cauda) = [(h, Right [(t, b)])] ++ geneUntar cauda 
+
+\end{code}
+
+\item \textbf{d)} |find :: a -> FS a b -> [Path a ]|
+
+\begin{code}
 
 find :: (Eq a) => a -> FS a b -> [Path a]
-find = undefined
+find (a) (f) = findAux (a) (cataFS(gFind) (f)) 
+
+--
+
+findAux :: (Eq a) => a -> [(a, Path a)] -> [Path a]
+findAux a [] = []
+findAux a ((a1, l):t) | (a == a1) = [l] ++ (findAux a t)
+                      | otherwise = (findAux a t)
+
+--
+
+gFind :: [(a, Either b [(a, Path a)])] -> [(a, Path a)] 
+gFind [] = []
+gFind ((a, Left b):t) = gFind t
+gFind ((a, Right p):t) = p ++ (gFind t)
+
+\end{code}
+
+\item \textbf{e)} |new :: Path a -> b -> FS a b -> FS a b|
+
+\begin{code}
+
+gNewCata :: [(a, Either b [(Path a, b)])] -> [(Path a, b)]
+gNewCata [] = []
+gNewCata ((a, Left b):t) = [([a], b)] ++ (gNewCata t)
+gNewCata ((a, Right l):t) = (addAllPaths a l) ++ (gNewCata t)
+
+gNewAna :: [(Path a, b)] -> [(a, Either b [(Path a, b)])]
+gNewAna [] = []
+gNewAna (([x], b):t) = [(x, Left b)] ++ (gNewAna t)
+gNewAna (((h:t), b):t1) = [(h, Right [(t, b)])] ++ (gNewAna t1)
 
 new :: (Eq a) => Path a -> b -> FS a b -> FS a b
-new = undefined
+new p b fs = untar( tar (fs) ++ [(p, b)])
 
-cp :: (Eq a) => Path a -> Path a -> FS a b -> FS a b
-cp = undefined
+--new (p) (b) (fs) =  ( anaFS(gNewAna)  ( (cataFS (gNewCata) (fs)) ++ [(p, b)] ) )
+
+\end{code}
+
+\item \textbf{f)} |cp :: Path a -> Path a -> FS a b -> FS a b|
+
+\begin{code}
+
+encontraFile :: (Eq a) => Path a -> [(Path a,b)] -> b 
+encontraFile list ((x,y):t) | list == x = y 
+                            | otherwise = encontraFile list t 
+
+cp :: (Eq a) => Path a -> Path a -> FS a b -> FS a b 
+cp list1 list2 (FS list3) = new list2 (encontraFile list1 (tar (FS list3))) (FS list3)  
+
+\end{code}
+
+\item \textbf{g)} |rm :: Path a -> FS a b -> FS a b|
+
+Sugestão de implementação, definição de \textit{nav}:
+
+\begin{code}
+
+gNav :: (Eq a) => (Path a, FS a b) -> [(a, Either b (Path a, FS a b))]
+gNav ((h:t), FS []) = []
+gNav ((h:t), FS ((a, File b):t1) ) | (h == a) = [(a, Left b)]
+                                   | otherwise = gNav (h:t, FS t1)
+gNav ((h:t), FS ((a, Dir f):t1) )  | (h == a) = [(a, Right (t, f))] 
+                                   | otherwise = gNav (h:t, FS t1) 
+
+
+nav :: (Eq a) => (Path a, FS a b) -> FS a b
+nav = anaFS gNav
+
+\end{code}
+
+Definição de \textit{rm}:
+
+\begin{code}
 
 rm :: (Eq a) => (Path a) -> (FS a b) -> FS a b
 rm = undefined
+
+\end{code}
+
+\item Definições extras:
+
+\begin{code}
 
 auxJoin :: ([(a, Either b c)],d) -> [(a, Either b (d,c))]
 auxJoin = undefined
 
 cFS2Exp :: a -> FS a b -> (Exp () a)
 cFS2Exp = undefined
+
 \end{code}
+
+\end{enumerate*}
 
 %----------------- Fim do anexo com soluções dos alunos ------------------------%
 
