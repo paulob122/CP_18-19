@@ -1,6 +1,7 @@
 # CP_Projeto_2019
-Project for Program Calculus subject
 
-Group: João Azevedo | Paulo Araújo | Pedro Machado
+Program Calculus project in Haskell
 
-University of Minho, Software Engeneering.
+Group members: João Azevedo | Paulo Araújo | Pedro Machado
+
+University of Minho, Software Engeneering [2º year].
