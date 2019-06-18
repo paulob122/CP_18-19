@@ -13,6 +13,7 @@
 \def\aspas#1{``#1"}
 %================= lhs2tex=====================================================%
 %include polycode.fmt 
+%format (expn (a) (n)) = "{" a "}^{" n "}"
 %format (div (x)(y)) = x "\div " y
 %format succ = "\succ "
 %format ==> = "\Longrightarrow "
@@ -1131,6 +1132,8 @@ outras funções auxiliares que sejam necessárias.
 
 \subsubsection*{Pergunta 1 - Definições base para o tipo de dados}
 
+\hspace{0.5cm}
+
 \begin{code}
 
 inExpr :: Either Int (Op,(Expr,Expr)) -> Expr
@@ -1157,11 +1160,11 @@ Segue-se o diagrama mais apropriado para descrever este catamorfismo:
 \begin{eqnarray*}
 \xymatrix@@C=4cm{
     |Expr|
-           \ar[d]_-{|cataExpr g|}
+           \ar[d]_-{|f = cataExpr g|}
            \ar[r]_-{|outExpr|}
 &
     |Num + Op >< Expr >< Expr|
-           \ar[d]^-{|id + id >< (cataExpr g)|}
+           \ar[d]^-{|id + id >< f >< f|}
 \\
      |Int|
 &
@@ -1233,11 +1236,11 @@ opToCodigo (Op op) | op == "+" = "ADD"
 \begin{eqnarray*}
 \xymatrix@@C=4cm{
     |Expr|
-           \ar[d]_-{|cataExpr g|}
+           \ar[d]_-{|f = cataExpr g|}
            \ar[r]_-{|outExpr|}
 &
     |Num + Op >< Expr >< Expr|
-           \ar[d]^-{|id + id >< (cataExpr g)|}
+           \ar[d]^-{|id + id >< f >< f|}
 \\
      |[String]|
 &
@@ -1268,7 +1271,11 @@ string_codigo_2 = "2 + 1 * 3 + 4"
 
 \subsubsection*{Definições base do tipo de dados L2D}
 
-\hspace{0.5cm} O diagrama que representa um catamorfismo para este tipo é o seguinte:
+\hspace{0.5cm} 
+
+Este problema utilizava um tipo de dados que em muito se assemelhava com um tipo já conhecido por todos, as BTrees, daí ter sido mais fácil interpretar a estrutura de dados. Deste modo, as operações de \textit{in} e \textit{out}, entre outras, são semelhantes.
+
+O diagrama que representa um catamorfismo para este tipo é o seguinte:
 
 \begin{eqnarray*}
 \xymatrix@@C=4cm{
@@ -1311,6 +1318,8 @@ anaL2D g = inL2D . (recL2D (anaL2D g) ) . g
 
 \subsubsection*{Definições de funções dadas como undefined neste documento}
 
+\hspace{0.5cm} Algumas das definições necessárias para a implementação daquela que seria a função principal \textit{calcOrigins} foram disponibilizadas no ficheiro fornecido e, deste modo, serviram para facilitar o anamorfismo que definia esta função.
+
 \begin{code}
 
 collectLeafs (Unid a) = [a]
@@ -1330,6 +1339,28 @@ casoComp (Ve, ((x1, y1), (x2, y2))) = (max x1 x2, y1 + y2)
 casoComp (Vd, ((x1, y1), (x2, y2))) = (max x1 x2, y1 + y2)   
 
 \end{code}
+
+\hspace{0.5cm} Segue-se, então, o diagrama que define um anamorfismo neste tipo de dados:
+
+\begin{eqnarray*}
+\xymatrix@@C=2.5cm{
+&
+    |X (Caixa, Origem) ()|
+&
+    |(Unid, O) + ((), (X (Caixa, O) (), X (Caixa, O) ())|
+        \ar[l]^-{|inL2D|}
+\\
+&
+    |(L2D, O)|
+        \ar[u]^-{|f = anaL2D|}
+        \ar[r]_-{|g|}
+&
+    |(Unid, O) + ((), ((L2D, O), (L2D, O)))|
+        \ar[u]_-{|id + id >< f >< f|}
+}
+\end{eqnarray*}
+
+\textit{Onde "O" representa o tipo Origem.}
 
 \subsubsection*{Pergunta 1}
 
@@ -1443,13 +1474,19 @@ Primeiro consideramos o \textit{cos x n} como sendo \textit{c x n}, assim, podem
 \begin{spec}
 
 c x 0       = 1
-c x (n + 1) = c x n + ((-1)^(n+1) * x^(2*n+2)) / ((2*n + 2)!) = c x n + h x n
+c x (n + 1) = c x n + (expn ((-1)) (n+1) * (expn(x) (2*n+2)) / ((2*n + 2)!) = c x n + h x n
 
-h x 0 = ((-x)^2) / 2 
-h x (n + 1) = (h x n) * (((-x)^2) / ((2*n + 4) * (2*n + 3))) = (h x n) * ((-x)^2) / (s n)
+h x n = (expn ((-1)) (n+1) * (expn (x) (2n+2))) / ((2n + 2)!)
+
+h x 0 = (expn ((-x)) (2) / 2 
+h x (n + 1) = (h x n) * ((expn ((-x)) (2)) / ((2*n + 4) * (2*n + 3))) = (h x n) * (expn ((-x)) (2)) / (s n)
+
+s x n = ((2*n + 4) * (2*n + 3)))
 
 s 0 = 12
 s (n + 1) = s n + 8 * n + 18 = s n + f n
+
+f x n = 8 * n + 18
 
 f 0 = 18
 f (n + 1) = f n + 8
@@ -1519,38 +1556,40 @@ E também o diagrama para um catamorfismo genérico para este tipo de dados:
 
 \item \textbf{a)} |check :: FS a b -> Bool|
 
+\hspace{0.5cm} 
+
 \begin{code}
 
-check :: (Eq a) => FS a b -> Bool
+-- \textit{Para verificar se o sistema de ficheiros é válido.}
+
+check :: (Eq a, Eq b) => FS a b -> Bool
 check = cataFS geneCheck
 
---
-
-geneCheck :: (Eq a) => [(a, Either b Bool)] -> Bool
+geneCheck :: (Eq a, Eq b) => [(a,Either b Bool)] -> Bool
 geneCheck [] = True
-geneCheck ((x, Left b):t) = geneCheck t 
-geneCheck ((x, Right b):t) | b == False = False
-                        | otherwise = geneCheck t && not(repetidos(paraLista((x, Right b):t)))
+geneCheck ((a, Left b):cauda) = naoTemRepetidos(passaLista (((a, Left b):cauda))) && geneCheck cauda
+geneCheck ((a, Right bool):cauda) = bool && geneCheck cauda
 
---
+-- \textit{Verifica se um par existe numa lista de pares.}
 
-estaNaLista :: (Eq a) =>  a -> [a] -> Bool
-estaNaLista _ [] = False
-estaNaLista x (h:t) | x == h    = True
-                    | otherwise = estaNaLista x t
+containsPair :: (Eq a, Eq b) => (a,b) -> [(a,b)] -> Bool
+containsPair (a,b) [] = False
+containsPair (a,b) ((h,k):t) | (a == h) && (b == k)= True
+                         | otherwise = containsPair (a,b) t 
 
---
+-- \textit{Verifica se uma lista de pares não tem elementos repetidos.}
 
-repetidos :: (Eq a) => [a] -> Bool
-repetidos [] = False
-repetidos (h:t) | estaNaLista h t == True = True
-                | otherwise = repetidos t
+naoTemRepetidos :: (Eq a, Eq b) =>  [(a,b)] -> Bool
+naoTemRepetidos [x] = True
+naoTemRepetidos (h:t) | containsPair h t = False
+                      | otherwise = naoTemRepetidos t
 
---
+-- \textit{Cria uma lista de pares no qual a primeira componente é o nome da Dir/File e a segunda componente é o conteúdo.}
 
-paraLista :: [(a, Either b c)] -> Path a
-paraLista [] = []
-paraLista ((x,y):t) = [x] ++ paraLista t
+passaLista  :: [(a,Either b bool)] -> [(a,b)]
+passaLista [] = []
+passaLista ((a, Left b):cauda) = [(a,b)] ++ passaLista cauda
+passaLista ((a,Right bool):cauda) = passaLista cauda
 
 \end{code}
 
@@ -1565,6 +1604,8 @@ geneTar :: [(a, Either b [(Path a, b)])] -> [(Path a, b)]
 geneTar [] = []
 geneTar ((a, Left b):t) = [([a], b)] ++ geneTar t
 geneTar ((a, Right l):t) = (addAllPaths a l) ++ (geneTar t)
+
+-- \textit{Para adicionar uma diretoria à lista de diretorias existentes, onde temos uma par composto por um ficheiro e as diretorias necessárias para o alcançar.}
 
 addAllPaths :: a -> [(Path a, b)] -> [(Path a, b)] 
 addAllPaths a [] = [] 
@@ -1589,8 +1630,9 @@ geneUntar (((h:t), b):cauda) = [(h, Right [(t, b)])] ++ geneUntar cauda
 
 \end{code}
 
-Esta solução utiliza um anamorfismo que é descrito de seguida:
+A função untar utiliza um anamorfismo que é descrito de seguida:
 \par
+\begin{eqnarray*}
 \xymatrix@@C=2.5cm{
 &
     |FS a b|
@@ -1615,19 +1657,32 @@ Esta solução utiliza um anamorfismo que é descrito de seguida:
 find :: (Eq a) => a -> FS a b -> [Path a]
 find (a) (f) = findAux (a) (cataFS(gFind) (f)) 
 
---
+-- \textit{Verifica se um elemento existe numa lista.}
+
+contains :: (Eq a) => a -> [a] -> Bool
+contains a [] = False
+contains a (h:t) | (a == h) = True
+                 | otherwise = contains a t 
+
+-- \textit{A partir de uma lista devolve a lista de diretorias associadas ao ficheiro pretendido.}
 
 findAux :: (Eq a) => a -> [(a, Path a)] -> [Path a]
 findAux a [] = []
-findAux a ((a1, l):t) | (a == a1) = [l] ++ (findAux a t)
+findAux a ((a1, l):t) | contains a l = [l] ++ (findAux a t)
                       | otherwise = (findAux a t)
+
+-- \textit{Adiciona uma nova diretoria à lista de diretorias de um ficheiro.}
+
+addPathA :: a -> [(a, Path a)] -> [(a, Path a)]
+addPathA a [] = []
+addPathA a ((a1, l):t) = [(a, [a] ++ l)] ++ addPathA a t 
 
 --
 
 gFind :: [(a, Either b [(a, Path a)])] -> [(a, Path a)] 
 gFind [] = []
-gFind ((a, Left b):t) = gFind t
-gFind ((a, Right p):t) = p ++ (gFind t)
+gFind ((a, Left b):t) = [(a, [a])] ++ gFind t
+gFind ((a, Right p):t) = (addPathA a p) ++ gFind t
 
 \end{code}
 
@@ -1636,21 +1691,14 @@ gFind ((a, Right p):t) = p ++ (gFind t)
 \begin{code}
 
 new :: (Eq a) => Path a -> b -> FS a b -> FS a b
-new p b fs = untar( tar (fs) ++ [(p, b)])
+new p b fs = untar( ordenaPath (tar (fs)) (p, b) )
 
---
+-- \textit{Insere um Path e correspondente ficheiro na lista de diretorias do Sistema de ficheiros de forma ordenada.}
 
-gNewCata :: [(a, Either b [(Path a, b)])] -> [(Path a, b)]
-gNewCata [] = []
-gNewCata ((a, Left b):t) = [([a], b)] ++ (gNewCata t)
-gNewCata ((a, Right l):t) = (addAllPaths a l) ++ (gNewCata t)
-
---
-
-gNewAna :: [(Path a, b)] -> [(a, Either b [(Path a, b)])]
-gNewAna [] = []
-gNewAna (([x], b):t) = [(x, Left b)] ++ (gNewAna t)
-gNewAna (((h:t), b):t1) = [(h, Right [(t, b)])] ++ (gNewAna t1)
+ordenaPath :: (Eq a) => [(Path a, b)] -> (Path a, b) -> [(Path a, b)]
+ordenaPath [] (l,b) = [(l,b)]
+ordenaPath ((l, b):t) (l1, b1) | (take ((length l) -1)(l)) == (take ((length l) -1)(l1)) = (l,b) : (l1, b1) : t
+                               | otherwise = (l,b) : ordenaPath t (l1,b1)
 
 \end{code}
 
@@ -1661,7 +1709,7 @@ gNewAna (((h:t), b):t1) = [(h, Right [(t, b)])] ++ (gNewAna t1)
 cp :: (Eq a) => Path a -> Path a -> FS a b -> FS a b 
 cp list1 list2 (FS list3) = new list2 (encontraFile list1 (tar (FS list3))) (FS list3)  
 
---
+-- \textit{Devolve, se encontrar, o conteúdo de um ficheiro associado a um Path.}
 
 encontraFile :: (Eq a) => Path a -> [(Path a,b)] -> b 
 encontraFile list ((x,y):t) | list == x = y 
@@ -1681,6 +1729,7 @@ nav = anaFS gNav
 --
 
 gNav :: (Eq a) => (Path a, FS a b) -> [(a, Either b (Path a, FS a b))]
+gNav ([],FS []) = []
 gNav ((h:t), FS []) = []
 gNav ([], FS ((a, File b):t1)) = [(a, Left b)] ++ gNav ([], FS t1)
 gNav ([], FS ((a, Dir f):t1))  = [(a, Right ([], f))] ++ gNav ([], FS t1)
@@ -1692,13 +1741,20 @@ gNav ((h:t), FS ((a, Dir f):t1) )  | (h == a) = [(a, Right (t, f))]
 --
 
 geneRemove :: (Eq a) => (FS a b, FS a b) -> [(a, Either b (FS a b, FS a b))] 
-geneRemove (FS [], FS l) = []
-geneRemove (FS ((a, File b):t1), FS []) = [(a, Left b)] ++ geneRemove (FS t1, FS [])
+geneRemove (FS [], _) = []
 geneRemove (FS ((a, Dir f):t1), FS []) = [(a, Right (f, FS []))] ++ geneRemove (FS t1, FS [])
-geneRemove (FS ((a, File b):t1), FS h) | a == (fst (head h)) = [] 
-                                         | otherwise    = [(a, Left b)] ++ geneRemove (FS t1, FS h) 
-geneRemove (FS ((a, Dir f):t1), FS h) | a == (fst (head h)) = []
-                                        | otherwise    = [(a, Right (f, FS h))] ++ geneRemove (FS t1, FS h)
+geneRemove (FS ((a, File b):t1), FS []) = [(a, Left b)] ++ geneRemove (FS t1, FS [])
+geneRemove (FS ((a, File b):t1), FS ((a1, File b1):t2)) | a == a1 = [(a, Right (FS t1, FS[]))] 
+                                                        | otherwise = [(a, Left b)] 
+                                                        ++ geneRemove(FS t1, FS ((a1, File b1):t2))
+geneRemove (FS ((a, Dir f1):t1), FS ((a1, Dir f2):t2)) | a == a1 = [(a, Right (FS t1, FS []))] 
+                                                        ++ geneRemove(f1, f2)
+                                                       | otherwise = [(a, Right (f1, FS[]))] 
+                                                        ++ geneRemove(FS t1, FS ((a1, Dir f2):t2))
+geneRemove (FS ((a, File b):t1), FS ((a1, Dir f2):t2)) | a /= a1 = [(a, Left b)] 
+                                                        ++ geneRemove (FS t1, FS ((a1, Dir f2):t2))
+geneRemove (FS ((a, Dir f1):t1), FS ((a1, File b):t2)) | a /= a1 = [(a, Right (f1, FS []))] 
+                                                        ++ geneRemove(FS t1, FS ((a1, File b):t2))
 
 \end{code}
 
